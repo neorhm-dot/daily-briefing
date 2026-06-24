@@ -87,7 +87,7 @@ PORTFOLIO = {
     "삼성전자":       {"ticker": "005930.KS", "type": "KR"},
     "실리콘투":       {"ticker": "257720.KQ", "type": "KR"},
     "한미반도체":     {"ticker": "042700.KS", "type": "KR"},
-    "ACE AI반도체TOP3+": {"ticker": "469150.KQ", "type": "KR"},
+    "ACE AI반도체TOP3+": {"ticker": "469150.KS", "type": "KR"},
     "Redwire":       {"ticker": "RDW",        "type": "US"},
     "Microsoft":     {"ticker": "MSFT",       "type": "US"},
 }
