@@ -84,12 +84,12 @@ def send_kakao(text: str, token: str):
 # 주식 가격 조회 (Yahoo Finance API)
 # ──────────────────────────────────────────────
 PORTFOLIO = {
-    "삼성전자":  {"ticker": "005930.KS", "type": "KR"},
-    "제닉스":    {"ticker": "257720.KQ", "type": "KR"},
-    "한양이엔지": {"ticker": "042700.KS", "type": "KR"},
-    "케이에스피": {"ticker": "451340.KQ", "type": "KR"},
-    "Redwire":   {"ticker": "RDW",        "type": "US"},
-    "Microsoft": {"ticker": "MSFT",       "type": "US"},
+    "삼성전자":       {"ticker": "005930.KS", "type": "KR"},
+    "실리콘투":       {"ticker": "257720.KQ", "type": "KR"},
+    "한미반도체":     {"ticker": "042700.KS", "type": "KR"},
+    "ACE AI반도체TOP3": {"ticker": "451340.KQ", "type": "KR"},
+    "Redwire":       {"ticker": "RDW",        "type": "US"},
+    "Microsoft":     {"ticker": "MSFT",       "type": "US"},
 }
 
 def get_stock_price(ticker: str) -> dict:
@@ -141,12 +141,12 @@ def fetch_prices() -> list[dict]:
 # 뉴스 조회 (Google News RSS)
 # ──────────────────────────────────────────────
 NEWS_QUERIES = {
-    "삼성전자": "삼성전자 주식",
-    "제닉스":   "제닉스",
-    "한양이엔지": "한양이엔지",
-    "케이에스피": "케이에스피 KSP",
-    "Redwire":   "Redwire RDW stock",
-    "Microsoft": "Microsoft MSFT stock",
+    "삼성전자":         "삼성전자 주식",
+    "실리콘투":         "실리콘투 주식",
+    "한미반도체":       "한미반도체 주식",
+    "ACE AI반도체TOP3": "ACE AI반도체 ETF",
+    "Redwire":         "Redwire RDW stock",
+    "Microsoft":       "Microsoft MSFT stock",
 }
 
 def fetch_news(query: str, max_items: int = 3) -> list[dict]:
