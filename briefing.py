@@ -35,20 +35,33 @@ TODAY = datetime.now(KST).strftime("%Y-%m-%d")
 TODAY_KR = datetime.now(KST).strftime("%Y년 %m월 %d일")
 
 # ──────────────────────────────────────────────
-# 카카오 토큰 갱신
+# 카카오 토큰 갱신 (다음 실행을 위해 GitHub Output에 저장)
 # ──────────────────────────────────────────────
-def refresh_kakao_token():
-    """refresh_token으로 새 access_token 발급"""
-    resp = requests.post("https://kauth.kakao.com/oauth/token", data={
-        "grant_type": "refresh_token",
-        "client_id": KAKAO_CLIENT_ID,
-        "client_secret": KAKAO_CLIENT_SECRET,
-        "refresh_token": KAKAO_REFRESH_TOKEN,
-    })
-    data = resp.json()
-    if "access_token" in data:
-        return data["access_token"]
-    raise Exception(f"토큰 갱신 실패: {data}")
+def refresh_for_next_run() -> str | None:
+    """refresh_token으로 새 access_token 발급 → GitHub Actions output에 저장"""
+    try:
+        resp = requests.post("https://kauth.kakao.com/oauth/token", data={
+            "grant_type": "refresh_token",
+            "client_id": KAKAO_CLIENT_ID,
+            "client_secret": KAKAO_CLIENT_SECRET,
+            "refresh_token": KAKAO_REFRESH_TOKEN,
+        })
+        data = resp.json()
+        if "access_token" in data:
+            new_token = data["access_token"]
+            # GitHub Actions output에 저장 (workflow에서 Secret 업데이트에 사용)
+            output_file = os.environ.get("GITHUB_OUTPUT", "")
+            if output_file:
+                with open(output_file, "a") as f:
+                    f.write(f"new_kakao_token={new_token}\n")
+            print(f"🔄 다음 실행용 토큰 갱신 완료")
+            return new_token
+        else:
+            print(f"⚠️ 토큰 갱신 응답: {data}")
+            return None
+    except Exception as e:
+        print(f"⚠️ 토큰 갱신 실패: {e}")
+        return None
 
 # ──────────────────────────────────────────────
 # 카카오톡 전송
@@ -275,14 +288,9 @@ def send_email(subject: str, html_body: str):
 def main():
     print(f"=== 포트폴리오 브리핑 시작 ({TODAY}) ===")
 
-    # 1. 토큰 갱신
-    print("🔑 카카오 토큰 갱신 중...")
-    try:
-        token = refresh_kakao_token()
-        print("✅ 토큰 갱신 완료")
-    except Exception as e:
-        print(f"⚠️ 토큰 갱신 실패, 기존 토큰 사용: {e}")
-        token = KAKAO_ACCESS_TOKEN
+    # 1. 저장된 토큰 사용 (refresh 없이 직접 사용)
+    token = KAKAO_ACCESS_TOKEN
+    print(f"🔑 카카오 토큰 로드 완료")
 
     # 2. 주가 조회
     print("📈 주가 조회 중...")
@@ -313,6 +321,10 @@ def main():
     html = build_html_email(prices, news_map)
     subject = f"[포트폴리오 브리핑] {TODAY_KR}"
     send_email(subject, html)
+
+    # 6. 다음 실행을 위한 토큰 갱신
+    print("🔄 다음 실행용 카카오 토큰 갱신 중...")
+    refresh_for_next_run()
 
     print("=== 완료 ===")
 

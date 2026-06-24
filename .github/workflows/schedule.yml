@@ -23,6 +23,7 @@ jobs:
         run: pip install requests
 
       - name: 브리핑 실행
+        id: briefing
         env:
           KAKAO_ACCESS_TOKEN:  ${{ secrets.KAKAO_ACCESS_TOKEN }}
           KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
@@ -34,3 +35,12 @@ jobs:
           NAVER_CLIENT_ID:     ${{ secrets.NAVER_CLIENT_ID }}
           NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
         run: python briefing.py
+
+      - name: 카카오 토큰 자동 갱신
+        if: steps.briefing.outputs.new_kakao_token != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          echo "${{ steps.briefing.outputs.new_kakao_token }}" | \
+            gh secret set KAKAO_ACCESS_TOKEN --repo neorhm-dot/daily-briefing
+          echo "✅ KAKAO_ACCESS_TOKEN 자동 갱신 완료"
