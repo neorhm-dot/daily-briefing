@@ -288,9 +288,25 @@ def send_email(subject: str, html_body: str):
 def main():
     print(f"=== 포트폴리오 브리핑 시작 ({TODAY}) ===")
 
-    # 1. 저장된 토큰 사용 (refresh 없이 직접 사용)
-    token = KAKAO_ACCESS_TOKEN
-    print(f"🔑 카카오 토큰 로드 완료")
+    # 1. refresh_token으로 새 access_token 발급
+    print("🔑 카카오 토큰 갱신 중...")
+    try:
+        resp = requests.post("https://kauth.kakao.com/oauth/token", data={
+            "grant_type": "refresh_token",
+            "client_id": KAKAO_CLIENT_ID,
+            "client_secret": KAKAO_CLIENT_SECRET,
+            "refresh_token": KAKAO_REFRESH_TOKEN,
+        })
+        data = resp.json()
+        if "access_token" in data and data.get("scope") or data.get("allowed_scopes") != []:
+            token = data["access_token"]
+            print(f"✅ 토큰 갱신 완료 (scope: {data.get('scope','')})")
+        else:
+            print(f"⚠️ 갱신 토큰 스코프 없음, 저장된 토큰 사용: {data}")
+            token = KAKAO_ACCESS_TOKEN
+    except Exception as e:
+        print(f"⚠️ 토큰 갱신 실패, 저장된 토큰 사용: {e}")
+        token = KAKAO_ACCESS_TOKEN
 
     # 2. 주가 조회
     print("📈 주가 조회 중...")
